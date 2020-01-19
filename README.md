@@ -1,0 +1,1 @@
+This repository contains my solutions to exercises from https://exercism.io/tracks/typescript.
