@@ -12,46 +12,61 @@ export default class LinkedList<T> {
     }
 
     pop(): Nullable<T> {
-        let itemToReturn = this.lastElement.currentValue;
-        this.lastElement = this.lastElement.prev;
-        this.lastElement.setNext(undefined);
-        return itemToReturn;
+        if(this.lastElement) {
+            let itemToReturn = this.lastElement.currentValue;
+            this.lastElement = this.lastElement.prev;
+            if(this.lastElement) {
+                this.lastElement.setNext(undefined);    
+            }
+            return itemToReturn;
+        }
+        
+        return undefined;
     }
 
     shift(): Nullable<T> {
-        let item = this.lastElement.prev;
+        if(this.lastElement) {
+            let item = this.lastElement.prev;
 
-        if (item === undefined) {
-            let itemToReturn = this.lastElement.currentValue;
-            this.lastElement = undefined;
-            return itemToReturn;
-        }
+            if (item === undefined) {
+                let itemToReturn = this.lastElement.currentValue;
+                this.lastElement = undefined;
+                return itemToReturn;
+            }
 
-        while (item) {
-            item = item.prev;
-            if (item !== undefined && item.prev === undefined) {
-                let valueToReturn = item.currentValue;
-                item.next?.setPrev(undefined);
-                return valueToReturn;
+            while (item) {              
+                if (item.prev === undefined) {
+                    let valueToReturn = item.currentValue;
+                    if(item.next) {
+                        item.next.setPrev(undefined);
+                    }         
+                    return valueToReturn;
+                } else {
+                    item = item.prev;
+                }
             }
         }
     }
 
     unshift(newValue: T) {
-        let item = this.lastElement.prev;
-
-        if (item === undefined) {
-            let itemToReturn = this.lastElement.currentValue;
-            this.lastElement = undefined;
-            return itemToReturn;
-        }
-
-        while (item) {
-            item = item.prev;
-            if (item.prev === undefined) {
-                item.setPrev(new LinkedListItem(newValue, item));
+        if(this.lastElement){
+            let item = this.lastElement.prev;
+            
+            if(!item) {
+                this.lastElement.setPrev(new LinkedListItem(newValue));
+                return
             }
-        }
+            
+            while (item) {        
+                if (item.prev === undefined) {
+                    item.setPrev(new LinkedListItem(newValue));
+                } else {
+                    item = item.prev;
+                }
+            }
+        } else {
+            this.push(newValue);
+        }  
     }
 
     count(): number {
@@ -71,16 +86,29 @@ export default class LinkedList<T> {
     }
 
     delete(value: T) {
-        if(this.lastElement.currentValue === value) {
-            this.lastElement = undefined;
-        }
-        let item = this.lastElement.prev;
-        while(item) {
-            if(item.currentValue === value) {
-                item.next.setPrev(item.prev);
-                item.prev.setNext(item.next);
+        if(this.lastElement)
+        {
+            if(this.lastElement.currentValue === value) {
+                this.lastElement = this.lastElement.prev;
+                if(this.lastElement) {
+                    this.lastElement.next = undefined;
+                }              
+                return;
             }
-        }
+
+            let item = this.lastElement.prev;
+            while(item) {
+                if(item.currentValue === value) {
+                    if(item.next)
+                    item.next.setPrev(item.prev);
+                    if(item.prev)
+                    item.prev.setNext(item.next);
+                    return;
+                } else {
+                    item = item.prev;
+                }
+            }
+        }   
     }
 }
 
